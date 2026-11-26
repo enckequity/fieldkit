@@ -79,11 +79,11 @@ function paintNet() {
   const s = getSyncState();
   if (!isOnline()) { net.textContent = "device offline"; net.dataset.state = "off"; }
   // Reachability is evidence with a shelf life: only a contact in the last 60 s counts as "reachable".
-  else if (s.reachable === true && s.last_contact && Date.now() - Date.parse(s.last_contact) < 60_000) { net.textContent = "Hermes reachable"; net.dataset.state = "ok"; }
-  else if (s.reachable === true) { net.textContent = "checking Hermes…"; net.dataset.state = "wait"; }
-  else if (s.reachable === false) { net.textContent = "no Hermes connection"; net.dataset.state = "bad"; }
+  else if (s.reachable === true && s.last_contact && Date.now() - Date.parse(s.last_contact) < 60_000) { net.textContent = "Server reachable"; net.dataset.state = "ok"; }
+  else if (s.reachable === true) { net.textContent = "checking the server…"; net.dataset.state = "wait"; }
+  else if (s.reachable === false) { net.textContent = "no server connection"; net.dataset.state = "bad"; }
   else { net.textContent = "checking…"; net.dataset.state = "wait"; }
-  net.title = s.last_contact ? `Last contact with Hermes: ${new Date(s.last_contact).toLocaleString()}` : "No contact with Hermes yet";
+  net.title = s.last_contact ? `Last contact with the server: ${new Date(s.last_contact).toLocaleString()}` : "No contact with the server yet";
 }
 window.addEventListener("online", paintNet);
 window.addEventListener("offline", () => { paintNet(); });

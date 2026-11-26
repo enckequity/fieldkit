@@ -52,7 +52,7 @@ test("home: activity states, switching survives restart, entries under the right
   await p.locator("#f-condition label", { hasText: "Fair" }).click();
   await p.locator("#f-guard_ok label", { hasText: "Yes" }).click();
   await p.getByRole("button", { name: "Complete workflow" }).click();
-  await expect(p.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 40_000 });
+  await expect(p.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 40_000 });
   const ridA = p.url().split("#/results/")[1].split("?")[0];
 
   // B: offline, from the own workspace page: complete; it waits for sync.

@@ -1,7 +1,7 @@
 {
-  "name": "FieldKit for Hermes",
+  "name": "FieldKit",
   "short_name": "FieldKit",
-  "description": "Record offline, sync when back online, and ask your Hermes agent about what you recorded.",
+  "description": "Record offline, sync when back online, and ask your assistant about what you recorded.",
   "id": "./index.html",
   "start_url": "./index.html",
   "scope": "./",

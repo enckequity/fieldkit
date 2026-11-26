@@ -210,11 +210,11 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
         h("span", { key: "a", className: `fk-chip${status.app_built ? "" : " bad"}` }, status.app_built ? "phone app built" : "phone app NOT built")] },
         h(Track, { byStatus: sync.records_by_sync_status, conflicts: sync.open_conflicts }),
         h(Stats, { sync }),
-        h("p", { className: "fk-hint" }, "FieldKit collects and syncs. Ask your Hermes agent to read, analyse or summarise synced entries.")),
+        h("p", { className: "fk-hint" }, "FieldKit collects and syncs. Ask your assistant to read, analyse or summarise synced entries.")),
       h("div", { className: "fk-cols" },
         h(Section, { title: "Workspaces", meta: own.length || null },
           own.length ? h(Workspaces, { items: own })
-            : h("p", { className: "fk-empty" }, "No workspace yet. In Hermes, say: “Set up FieldKit for my work.”")),
+            : h("p", { className: "fk-empty" }, "No workspace yet. In chat with your assistant, say: “Set up FieldKit for my work.”")),
         h(Section, { title: "Recent records" }, h(RecordList, { records: recs.records, compact: true }))));
   }
 
@@ -314,7 +314,7 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
             : h("p", { className: "mute" }, "No photos, voice notes or signatures."),
           h("dl", { className: "fk-kv", style: { marginTop: 12 } },
             h("dt", null, "Completed on phone"), h("dd", null, ts(rec.completed_at)),
-            h("dt", null, "Received by Hermes"), h("dd", null, ts(rec.received_at)),
+            h("dt", null, "Received by the server"), h("dd", null, ts(rec.received_at)),
             h("dt", null, "Revision"), h("dd", null, rec.revision),
             rec.workspace_id ? [h("dt", { key: "wt" }, "Workspace"), h("dd", { key: "wd", className: "id" }, rec.workspace_id)] : null,
             rec.device_id ? [h("dt", { key: "dt" }, "Device"), h("dd", { key: "dd", className: "id" }, rec.device_id)] : null))),
@@ -324,7 +324,7 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
         questions.map((q: any) => h("div", { key: q.id, style: { margin: "6px 0" } },
           h("div", null, h("b", null, q.question), h("span", { className: "mute" }, `  ${q.status}`)), q.answer ? h("div", null, q.answer.answer) : null))) : null,
       rep ? h("div", { className: "fk-legacy" }, h("h3", null, "Report from FieldKit before 0.3"), h(ReportView, { r: rep })) : null,
-      h("p", { className: "fk-hint" }, "To analyse this entry, ask your Hermes agent. It can open the photos and voice notes."));
+      h("p", { className: "fk-hint" }, "To analyse this entry, ask your assistant. It can open the photos and voice notes."));
   }
 
   const sevColor: Record<string, string> = { critical: "var(--bad)", high: "var(--bad)", medium: "var(--wait)", low: "var(--ok)", info: "var(--mute)" };
@@ -339,7 +339,7 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
       h("b", null, "Evidence: "), att.summary,
       vn.attached > 0 && h("div", null, `Voice notes: ${vn.transcribed} of ${vn.attached} transcribed`,
         att.evidence.filter((e: any) => e.kind === "audio").map((e: any) => h("div", { key: e.attachment_id },
-          e.transcript ? `“${e.transcript}” (${e.transcript_source === "device" ? "transcribed on the phone" : "transcribed by Hermes"})`
+          e.transcript ? `“${e.transcript}” (${e.transcript_source === "device" ? "transcribed on the phone" : "transcribed by the assistant"})`
             : `Not transcribed: ${e.transcript_error ?? "unknown reason"}`))),
       att.evidence.filter((e: any) => e.kind === "signature").map((e: any) => h("div", { key: e.attachment_id, style: { marginTop: 4 } },
         `${e.field_label || "Signature"}${e.signed_at ? `, signed ${String(e.signed_at).replace("T", " ").slice(0, 16)}` : ""}: file ${INTEGRITY[e.integrity] ?? e.integrity}`,
@@ -402,9 +402,9 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
         c.workspace_title ? h("span", { className: "mute" }, `  in ${c.workspace_title}`) : null,
         c.completed_at ? h("span", { className: "mute" }, `  ${new Date(c.completed_at).toLocaleString()}`) : null),
       h("div", { className: "id" }, c.record_id),
-      h("p", { className: "mute" }, `The phone edited revision ${c.base_revision}; Hermes already has revision ${c.server_revision}. Choose which copy to keep.`),
+      h("p", { className: "mute" }, `The phone edited revision ${c.base_revision}; the server already has revision ${c.server_revision}. Choose which copy to keep.`),
       server ? h("table", { className: "fk-table", style: { marginTop: 8 } },
-        h("thead", null, h("tr", null, h("th", null, "Answer"), h("th", null, "Hermes copy"), h("th", null, "Phone copy"))),
+        h("thead", null, h("tr", null, h("th", null, "Answer"), h("th", null, "Server copy"), h("th", null, "Phone copy"))),
         h("tbody", null, keys.map((k) => {
           const diff = JSON.stringify(mine[k]) !== JSON.stringify(phone[k]);
           return h("tr", { key: k, style: diff ? { background: "color-mix(in srgb,var(--wait) 16%,transparent)" } : undefined },
@@ -458,7 +458,7 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
           h("div", { className: "fk-url" }, h("a", { href: url, target: "_blank", rel: "noopener" }, url),
             h("button", { className: "fk-btn", onClick: copy }, copied ? "Copied" : "Copy link")),
           h("ol", null,
-            h("li", null, "Scan the code (or open the link) on the phone while online and sign in to Hermes."),
+            h("li", null, "Scan the code (or open the link) on the phone while online and sign in to the server."),
             h("li", null, "Open your workspace and tap “Download everything for offline”. Optional: OCR and translation packs in Offline Packs."),
             h("li", null, "Add to Home Screen. Android: menu, then Install app. iPhone: Share, then Add to Home Screen."),
             h("li", null, "Check the Offline readiness card on Home. After that it works with no connection.")),
@@ -474,7 +474,7 @@ declare global { interface Window { __HERMES_PLUGIN_SDK__: any; __HERMES_PLUGINS
     return h("div", { className: "fk" },
       h("style", null, CSS),
       h("div", { className: "fk-top" },
-        h("span", { className: "mute" }, "Observations collected offline on phones, synced to Hermes"),
+        h("span", { className: "mute" }, "Observations collected offline on phones, synced to the server"),
         h("nav", { className: "fk-tabs", "aria-label": "FieldKit sections" },
           TABS.map(([n]) => h("button", { key: n, type: "button", "aria-pressed": n === tab, onClick: () => setTab(n) }, n)))),
       h(View, null));

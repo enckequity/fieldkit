@@ -248,7 +248,7 @@ def normalize_form(form: Any) -> tuple[Any, list[str]]:
     for k in LEGACY_FORM_KEYS:
         if k in w:
             w.pop(k)
-            fixes.append(f"'{k}' removed: FieldKit forms only collect (Hermes analyses entries when asked)")
+            fixes.append(f"'{k}' removed: FieldKit forms only collect (the assistant analyses entries when asked)")
     for k in ("status", "version"):
         w.pop(k, None)
     return w, fixes

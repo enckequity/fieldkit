@@ -189,15 +189,15 @@ export const settingsView: View = async (main) => {
   const shownAccount = acct ?? last;
   const devName = await currentDeviceLabel();
   const nameInput = h("input", { value: devName, maxlength: 80, "aria-label": "Device name" }) as HTMLInputElement;
-  main.append(h("div", { class: "card", id: "account-card" }, h("h2", null, "Hermes account"),
+  main.append(h("div", { class: "card", id: "account-card" }, h("h2", null, "Server account"),
     h("dl", { class: "kv" },
       h("dt", null, "Status"), h("dd", { "data-account-status": acct ? "signed-in" : getSyncState().auth_required ? "expired" : isOnline() ? "signed-out" : "offline" },
         acct ? "Signed in" : getSyncState().auth_required ? "Session expired — sign in again" : isOnline() ? "Not signed in" : "Offline (not checked)"),
       h("dt", null, acct ? "Signed in as" : "Last signed in as"), h("dd", null, shownAccount ? (shownAccount.display_name || shownAccount.user_id) : "—"),
       h("dt", null, "Account ID"), h("dd", { "data-account-id": shownAccount?.user_id ?? "" }, shownAccount ? shownAccount.user_id : "—"),
       h("dt", null, "Sign-in method"), h("dd", null, shownAccount?.provider || "—")),
-    h("p", { class: "muted" }, "Every browser and Home Screen app signs in separately, but the same Account ID means the same Hermes account: records from all of them are on Hermes together."),
-    acct ? null : h("button", { class: "primary", onclick: () => signIn("#/settings") }, "Sign in to Hermes")));
+    h("p", { class: "muted" }, "Every browser and Home Screen app signs in separately, but the same Account ID means the same server account: records from all of them are on the server together."),
+    acct ? null : h("button", { class: "primary", onclick: () => signIn("#/settings") }, "Sign in to the server")));
   main.append(h("div", { class: "card", id: "device-card" }, h("h2", null, "This device"),
     h("dl", { class: "kv" }, h("dt", null, "Name"), h("dd", { "data-device-name": devName }, devName)),
     h("label", { class: "q" }, "Rename this device"),
@@ -209,11 +209,11 @@ export const settingsView: View = async (main) => {
     } }, "Save")),
     h("details", { id: "advanced", style: "margin-top:.8rem" }, h("summary", null, "Advanced"),
       h("dl", { class: "kv" }, h("dt", null, "Device ID"), h("dd", { "data-device-id": dev }, dev),
-        h("dt", null, "Hermes data store"), h("dd", { "data-store-id": hstatus?.store?.store_id ?? "" }, hstatus?.store?.store_id || (acct ? "unknown (older server)" : "—")),
-        h("dt", null, "Hermes machine"), h("dd", null, hstatus?.instance?.machine ? `${hstatus.instance.machine}${hstatus.instance.region ? ` (${hstatus.instance.region})` : ""}` : "—"),
+        h("dt", null, "Server data store"), h("dd", { "data-store-id": hstatus?.store?.store_id ?? "" }, hstatus?.store?.store_id || (acct ? "unknown (older server)" : "—")),
+        h("dt", null, "Server machine"), h("dd", null, hstatus?.instance?.machine ? `${hstatus.instance.machine}${hstatus.instance.region ? ` (${hstatus.instance.region})` : ""}` : "—"),
         h("dt", null, "Your records on it"), h("dd", { "data-store-records": String(hstatus?.store?.records_for_you ?? "") }, hstatus?.store ? String(hstatus.store.records_for_you) : "—"),
         h("dt", null, "FieldKit server"), h("dd", null, hstatus?.version ?? "—")),
-      h("p", { class: "muted" }, "Technical details for troubleshooting. Two installs signed in to the same account should show the same Hermes data store and record count."))));
+      h("p", { class: "muted" }, "Technical details for troubleshooting. Two installs signed in to the same account should show the same server data store and record count."))));
 
   // ---- Storage: three clearly different states, calm wording, no false promises (see storage.ts)
   const ss = await storageState();
@@ -232,7 +232,7 @@ export const settingsView: View = async (main) => {
   if (RUNNING_FROM_LEGACY_PATH && ss.standalone) {
     const link = PUBLIC_APP_URL.toString();
     main.append(h("div", { class: "card", id: "readd-card" }, h("h2", null, "Re-add FieldKit to your Home Screen"),
-      h("p", null, "This icon opens FieldKit's old address, which shows an error page instead of the app when your Hermes session has expired. Your records are safe and will appear in the new icon too."),
+      h("p", null, "This icon opens FieldKit's old address, which shows an error page instead of the app when your server session has expired. Your records are safe and will appear in the new icon too."),
       h("ol", null, h("li", null, "Copy the link below and open it in Safari."), h("li", null, "Tap Share → Add to Home Screen."),
         h("li", null, "Open the new icon and sign in once, then remove the old icon.")),
       h("pre", { class: "wrap" }, link),
@@ -267,21 +267,21 @@ export const settingsView: View = async (main) => {
 
   const synced = (await d.getAll("records")).filter((r) => r.sync_status === "synced");
   main.append(h("div", { class: "card", id: "free-space-card" }, h("h2", null, "Free up space"),
-    h("p", { class: "muted" }, `${synced.length} record(s) on this device are confirmed by Hermes. Before removing any, FieldKit checks that Hermes still has them; records Hermes doesn't have are kept. Records not yet confirmed are never removed.`),
+    h("p", { class: "muted" }, `${synced.length} record(s) on this device are confirmed by the server. Before removing any, FieldKit checks that server still has them; records the server doesn't have are kept. Records not yet confirmed are never removed.`),
     h("button", { class: "danger", disabled: !synced.length, onclick: async (ev: Event) => {
       const btn = ev.currentTarget as HTMLButtonElement;
-      if (!confirm(`Remove up to ${synced.length} record(s) from this device? They stay in your Hermes account.`)) return;
+      if (!confirm(`Remove up to ${synced.length} record(s) from this device? They stay in your server account.`)) return;
       btn.disabled = true;
       let onServer: Set<string>;
       try { onServer = new Set((await fetchAllRecords((p) => api(p))).records.map((r) => r.id)); }
       catch (e) {
-        toast(e instanceof AuthRequired ? "Sign in to Hermes first, so FieldKit can check what Hermes has." : `Nothing removed: ${describeLoadProblem(e, isOnline()).message}`, "error");
+        toast(e instanceof AuthRequired ? "Sign in to the server first, so FieldKit can check what the server has." : `Nothing removed: ${describeLoadProblem(e, isOnline()).message}`, "error");
         btn.disabled = false; return;
       }
       const safe = synced.filter((r) => onServer.has(r.id));
       for (const r of safe) await deleteRecord(r.id);
       const kept = synced.length - safe.length;
-      toast(`Removed ${safe.length} record(s).${kept ? ` Kept ${kept} that Hermes doesn't have. See Saved Records.` : ""}`, kept ? "info" : "ok");
+      toast(`Removed ${safe.length} record(s).${kept ? ` Kept ${kept} that the server doesn't have. See Saved Records.` : ""}`, kept ? "info" : "ok");
       go(`#/settings?r=${Date.now()}`);
     } }, "Remove confirmed records")));
 };
@@ -338,14 +338,14 @@ export const diagnosticsView: View = async (main) => {
     const s = getSyncState();
     list.append(h("dl", { class: "kv" },
       h("dt", null, "Device says online"), h("dd", null, String(navigator.onLine)),
-      h("dt", null, "App status"), h("dd", null, s.reachable === true ? `Hermes reachable (last proof ${fmtTime(s.last_contact)})` : s.reachable === false ? "Hermes NOT reachable" : "not checked"),
+      h("dt", null, "App status"), h("dd", null, s.reachable === true ? `Server reachable (last proof ${fmtTime(s.last_contact)})` : s.reachable === false ? "Server NOT reachable" : "not checked"),
       h("dt", null, "App version"), h("dd", null, APP_VERSION),
       h("dt", null, "Service worker"), h("dd", null, navigator.serviceWorker?.controller ? "active (offline cache in use)" : "not controlling this page")));
     const rows = netEntries().slice().reverse().slice(0, 25);
     list.append(h("h3", null, "Recent requests (newest first)"),
       rows.length ? h("ul", { class: "clean" }, ...rows.map((e) => h("li", null,
         h("strong", { class: e.outcome === "network-error" ? "no" : e.hermes ? "ok" : "wait" },
-          e.outcome === "network-error" ? "NO NETWORK" : `${e.status}${e.hermes ? " ✔ Hermes" : " ? not Hermes"}`),
+          e.outcome === "network-error" ? "NO NETWORK" : `${e.status}${e.hermes ? " ✔ server" : " ? not the server"}`),
         ` ${e.method} ${e.path}`,
         h("div", { class: "muted" }, `${fmtTime(e.t)} · ${e.ms} ms · device online=${e.online}`
           + (e.server_date ? ` · server clock ${e.server_date}` : "") + (e.final_url && e.final_url !== e.path ? ` · answered by ${e.final_url}` : "")
@@ -363,24 +363,24 @@ export const diagnosticsView: View = async (main) => {
       const body = ct.includes("json") ? await res.json().catch(() => null) : (await res.text().catch(() => "")).slice(0, 160);
       const date = res.headers.get("date");
       if (res.type === "opaqueredirect") {
-        msg = h("div", { class: "banner warn" }, h("strong", null, "Something redirected the request — not Hermes."),
-          h("div", null, "Typical of a Wi-Fi login page (hotel, office, café). The phone has a network but cannot reach Hermes."));
+        msg = h("div", { class: "banner warn" }, h("strong", null, "Something redirected the request — not the server."),
+          h("div", null, "Typical of a Wi-Fi login page (hotel, office, café). The phone has a network but cannot reach the server."));
       } else if (ct.includes("json") && body && typeof body === "object" && "user_id" in body) {
-        msg = h("div", { class: "banner hermes" }, h("strong", null, "Connected: Hermes answered just now."),
+        msg = h("div", { class: "banner hermes" }, h("strong", null, "Connected: the server answered just now."),
           h("div", null, `Signed in as ${(body as any).display_name || (body as any).user_id}. Server clock: ${date ?? "n/a"}.`));
       } else if (res.status === 401 && ct.includes("json")) {
         msg = h("div", { class: "banner warn" }, h("strong", null, "Connected, but signed out."),
-          h("div", null, "Hermes answered (HTTP 401): this app's Hermes session has expired or it hasn't signed in yet."),
+          h("div", null, "The server answered (HTTP 401): this app's server session has expired or it hasn't signed in yet."),
           h("button", { class: "primary", onclick: () => signIn("#/diagnostics") }, "Sign in"));
       } else if (ct.includes("json") && body && typeof body === "object" && "detail" in body) {
-        msg = h("div", { class: "banner warn" }, h("strong", null, `Hermes answered with an error (HTTP ${res.status}).`),
+        msg = h("div", { class: "banner warn" }, h("strong", null, `The server answered with an error (HTTP ${res.status}).`),
           h("div", null, String((body as any).detail)));
       } else {
-        msg = h("div", { class: "banner warn" }, h("strong", null, `Something answered (HTTP ${res.status}, ${ct || "no type"}) but it is NOT Hermes.`),
+        msg = h("div", { class: "banner warn" }, h("strong", null, `Something answered (HTTP ${res.status}, ${ct || "no type"}) but it is NOT the server.`),
           h("div", null, `Answered by: ${res.url || "unknown"}. Body starts: ${typeof body === "string" ? body : JSON.stringify(body)?.slice(0, 160)}`));
       }
     } catch {
-      msg = h("div", { class: "banner local" }, h("strong", null, navigator.onLine ? "Can't reach Hermes." : "No connection."),
+      msg = h("div", { class: "banner local" }, h("strong", null, navigator.onLine ? "Can't reach the server." : "No connection."),
         h("div", null, navigator.onLine ? "The device reports a network, but the request didn't get through. Records stay on this device and upload later."
           : "This device is offline. FieldKit keeps working offline; records upload when you're connected."));
     }

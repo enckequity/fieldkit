@@ -101,7 +101,7 @@ test("photo, voice note and signature: playable on the entry, intact on Hermes, 
     return r.sync_status;
   }, { timeout: 60_000, intervals: [1_000] }).toBe("complete");
   await page.goto(`${APP}#/results/${id}?r=${Date.now()}`);
-  await expect(page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   await expect(page.locator('#result-media .media[data-media-state="ok"]')).toHaveCount(n, { timeout: 20_000 });
   await expect(page.locator(".media-problem")).toHaveCount(0);
   await expect(page.locator("#result-media").locator("..")).toContainText(summary);
@@ -154,7 +154,7 @@ test("photo, voice note and signature: playable on the entry, intact on Hermes, 
   await page.goto(`${APP}#/results/${id}?r=${Date.now()}`);
   const restored = page.locator(`#result-media .media[data-attachment-id="${photoId}"]`);
   await expect(restored).toHaveAttribute("data-media-state", "ok", { timeout: 20_000 });
-  await expect(restored).toContainText("restored from Hermes (verified)");
+  await expect(restored).toContainText("restored from the server (verified)");
 
   // Hermes' own tools get every file as a readable copy (for its vision / speech-to-text), right kind, intact.
   const out = execFileSync(PY, ["-c", `

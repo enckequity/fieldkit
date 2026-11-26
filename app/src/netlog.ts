@@ -94,7 +94,7 @@ export function report(extra: Record<string, unknown> = {}): string {
     "--- last requests (newest first) ---",
     ...entries.slice().reverse().slice(0, 40).map((e) =>
       `${e.t} ${e.method} ${e.path} → ${e.outcome === "network-error" ? `NETWORK ERROR (${e.note ?? ""})` : `${e.status} ${e.type} ${e.ctype ?? ""}`}`
-      + `${e.hermes ? " [verified Hermes]" : e.outcome === "response" ? " [NOT verified]" : ""}`
+      + `${e.hermes ? " [verified server]" : e.outcome === "response" ? " [NOT verified]" : ""}`
       + `${e.server_date ? ` server-date="${e.server_date}"` : ""}${e.final_url && e.final_url !== e.path ? ` final=${e.final_url}` : ""}`
       + ` ${e.ms}ms online=${e.online}`),
   ];

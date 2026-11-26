@@ -89,7 +89,7 @@ test("expired session: offline data stays accessible without login; online sync 
   page = await ctx.newPage();
   await page.goto(`${APP}#/sync`);
   await expect(page.locator("body")).not.toContainText("session_expired");
-  await expect(page.locator("text=Sign in to Hermes to continue syncing").first()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("text=Sign in to the server to continue syncing").first()).toBeVisible({ timeout: 30_000 });
   await expect(page.locator("header", { hasText: "sign-in needed" })).toBeVisible();
   await expect(page.locator("text=1 record(s)")).toBeVisible();          // still queued, nothing lost
   await page.getByRole("button", { name: "Sign in", exact: true }).first().click();

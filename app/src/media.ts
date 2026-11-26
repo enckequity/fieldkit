@@ -47,14 +47,14 @@ export async function attachmentUrl(a: Attachment, fetchImpl: typeof fetch = fet
   try {
     const { blob, bytes } = await memoryBlob(a.blob, a.mime);
     if (bytes.byteLength > 0 && (await sha256Hex(bytes)) === a.sha256) return { url: URL.createObjectURL(blob), source: "device", repaired: false };
-  } catch { /* unreadable on this device: try Hermes */ }
-  if (!a.uploaded) throw new Error("This file is damaged on this device and hasn't reached Hermes, so it can't be shown.");
+  } catch { /* unreadable on this device: try the server */ }
+  if (!a.uploaded) throw new Error("This file is damaged on this device and hasn't reached the server, so it can't be shown.");
   let res: Response;
   try { res = await fetchImpl(apiUrl(`attachments/${encodeURIComponent(a.id)}`), { credentials: "same-origin" }); }
-  catch { throw new Error("This file can't be read on this device. Connect to the internet to load Hermes' copy."); }
-  if (!res.ok) throw new Error(res.status === 401 ? "Sign in to Hermes to load this file." : `Hermes couldn't provide this file (HTTP ${res.status}).`);
+  catch { throw new Error("This file can't be read on this device. Connect to the internet to load the server's copy."); }
+  if (!res.ok) throw new Error(res.status === 401 ? "Sign in to the server to load this file." : `The server couldn't provide this file (HTTP ${res.status}).`);
   const bytes = await res.arrayBuffer();
-  if ((await sha256Hex(bytes)) !== a.sha256) throw new Error("Hermes' copy doesn't match the file captured on this device.");
+  if ((await sha256Hex(bytes)) !== a.sha256) throw new Error("The server's copy doesn't match the file captured on this device.");
   const blob = new Blob([bytes], { type: a.mime });
   let repaired = false;
   try { await (await db()).put("attachments", { ...a, blob }); repaired = true; } catch { /* still show it */ }
@@ -64,9 +64,9 @@ export async function attachmentUrl(a: Attachment, fetchImpl: typeof fetch = fet
 /** Load a file from Hermes for a record that isn't on this device (needs internet); verified when a hash is known. */
 export async function hermesMediaUrl(id: string, mime: string, sha256?: string, fetchImpl: typeof fetch = fetch): Promise<string> {
   const res = await fetchImpl(apiUrl(`attachments/${encodeURIComponent(id)}`), { credentials: "same-origin" });
-  if (!res.ok) throw new Error(res.status === 401 ? "Sign in to Hermes to load this file." : `Hermes couldn't provide this file (HTTP ${res.status}).`);
+  if (!res.ok) throw new Error(res.status === 401 ? "Sign in to the server to load this file." : `The server couldn't provide this file (HTTP ${res.status}).`);
   const bytes = await res.arrayBuffer();
-  if (sha256 && (await sha256Hex(bytes)) !== sha256) throw new Error("The file from Hermes failed its integrity check.");
+  if (sha256 && (await sha256Hex(bytes)) !== sha256) throw new Error("The file from the server failed its integrity check.");
   return URL.createObjectURL(new Blob([bytes], { type: mime || res.headers.get("content-type") || "application/octet-stream" }));
 }
 

@@ -73,7 +73,7 @@ test("Home: Saved Records shows the account total and how many are available off
   const A = await client();
   await ready(A);
   await complete(A.page, `AUD-${run}`);
-  await expect(A.page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(A.page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   const total = (await serverIds(A.ctx)).length;
   expect(total).toBeGreaterThan(1);                                     // the account has records from other devices
   await A.page.goto(`${APP}#/?r=${Date.now()}`);
@@ -112,11 +112,11 @@ test("a record Hermes rejected can be retried; removal never deletes what Hermes
   // 3. Rejected → visible problem with a way out → accepted after Try again.
   const rejected = await complete(A.page, `AUR-${run}`, wfId, wsId);
   await A.page.goto(`${APP}#/results/${rejected}?r=${Date.now()}`);
-  await expect(A.page.locator("text=Hermes didn't accept this record")).toBeVisible({ timeout: 30_000 });
+  await expect(A.page.locator("text=the server didn't accept this record")).toBeVisible({ timeout: 30_000 });
   await A.page.locator(`[data-retry="${rejected}"]`).click();
   await expect.poll(async () => (await serverIds(A.ctx)).includes(rejected), { timeout: 60_000, intervals: [1_000] }).toBe(true);
   await A.page.goto(`${APP}#/results/${rejected}?r=${Date.now()}`);
-  await expect(A.page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(A.page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   await expect(A.page.locator("#remove-from-device")).toBeVisible({ timeout: 15_000 });   // offered: Hermes has it
 
   // 4. Hermes loses a confirmed record: no "Remove from device" for it, and Free up space keeps it.

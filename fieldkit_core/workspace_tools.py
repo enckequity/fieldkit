@@ -117,7 +117,7 @@ def publish(a: dict) -> str:
     out["changes"] = ws.workspace_changes(prev, new_bundle)
     link = app_link(workspace_id=a["workspace_id"])
     return _ok(**out, app_link=link, next="Give the user app_link.url exactly as returned. On the phone: open the workspace and tap "
-               "'Update from Hermes' (or 'Download everything for offline' the first time). Old entries keep their version.")
+               "'Update from server' (or 'Download everything for offline' the first time). Old entries keep their version.")
 
 
 def undo_update(a: dict) -> str:
@@ -146,7 +146,7 @@ def undo_update(a: dict) -> str:
     out = ws.publish(store, wid, d["version"], actor=ALL)
     return _ok(**out, restored_from_version=target, undid_version=cur, changes=changes,
                next="Tell the user it is undone and list exactly what changed back (the 'changes' list, in plain words); on "
-                    "the phone, tap 'Update from Hermes'. Entries made with any version stay readable.")
+                    "the phone, tap 'Update from server'. Entries made with any version stay readable.")
 
 
 def get(a: dict) -> str:
