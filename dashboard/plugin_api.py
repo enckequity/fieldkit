@@ -2,7 +2,8 @@
 
 Every route sits behind the Hermes dashboard auth gate (Hermes returns 401 before this code runs
 for unauthenticated requests). The verified identity comes from ``request.state.session``
-(OAuth / basic provider) or is ``local`` on a loopback dashboard. Records, attachments and conflicts
+(OAuth / basic provider), from ``request.state.token_principal`` (a bearer-token route; it wins over a session and is
+never downgraded to ``local``), or is ``local`` on a loopback dashboard. Records, attachments and conflicts
 are scoped to that user; published forms and workspaces are instance-wide. Reports and questions from
 FieldKit versions before 0.3 stay readable (read-only routes).
 
@@ -45,7 +46,10 @@ ATTACHMENT_MIME = {"image/jpeg", "image/png", "image/webp", "audio/webm", "audio
 # ----------------------------------------------------------------------------- identity
 def _observe_origin(request: Request) -> None:
     """Remember the public URL users reach Hermes at (behind proxies too) so Hermes can hand out tappable app
-    links without configuration. Only called for authenticated requests."""
+    links without configuration. Only called for authenticated requests. Off whenever ``public_url`` is set: the
+    configured address is the only one links use then, and request headers are never recorded."""
+    if str(runtime.setting("public_url", "") or "").strip():
+        return
     try:
         h = request.headers
         proto = (h.get("x-forwarded-proto") or request.url.scheme).split(",")[0].strip().lower()
@@ -85,7 +89,38 @@ def current_user(request: Request) -> dict:
     return user
 
 
+# A bearer-token principal (``request.state.token_principal``, set by the engine's token middleware on a path a
+# provider registered with ``register_token_route``) names the member. It must carry this scope, so a token minted
+# for another route never becomes a FieldKit member.
+TOKEN_SCOPE = "fieldkit"
+
+
+def _token_user(request: Request) -> Optional[dict]:
+    """The member named by a verified bearer token, or None when the request carries none. Never reads a header:
+    only the engine's token middleware sets ``token_principal``. A principal that is present but not usable for
+    FieldKit is refused (403) instead of falling back to the session or ``local``."""
+    principal = getattr(request.state, "token_principal", None)
+    if principal is None:
+        return None
+    if getattr(request.state, "token_authenticated", False) is not True:
+        raise HTTPException(403, "Forbidden")
+    # Peer passes (agent-to-agent) also set token_principal; another agent is never a FieldKit member.
+    if getattr(request.state, "peer_principal", None) is not None:
+        raise HTTPException(403, "Forbidden")
+    pid = getattr(principal, "principal", None)
+    scopes = getattr(principal, "scopes", None) or ()
+    if not isinstance(pid, str) or not pid.strip() or pid.strip() != pid or pid in ("local", "owner"):
+        raise HTTPException(403, "Forbidden")
+    if not isinstance(scopes, (tuple, list, frozenset, set)) or TOKEN_SCOPE not in scopes:
+        raise HTTPException(403, "Forbidden")
+    provider = getattr(principal, "provider", "") or "token"
+    return {"user_id": pid, "display_name": "", "provider": str(provider)}
+
+
 def _current_user(request: Request) -> dict:
+    token = _token_user(request)
+    if token is not None:
+        return token
     sess = getattr(request.state, "session", None)
     if sess is not None:
         uid = getattr(sess, "user_id", None) or (sess.get("user_id") if isinstance(sess, dict) else None)
