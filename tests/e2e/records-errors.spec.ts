@@ -58,7 +58,7 @@ test.describe("simulated server failures (route() cannot intercept service-worke
     await openRecords();
     await expect(page.locator("#records-list li")).toHaveCount(serverCount);
     await expect(page.locator("#records-partial")).toHaveAttribute("data-problem", "server-outdated");
-    await expect(page.locator("#records-partial")).toContainText("Restart the Hermes dashboard");
+    await expect(page.locator("#records-partial")).toContainText("Restart the dashboard");
     await expect(page.locator("#records-note")).toHaveCount(0);
     await expect(page.locator("#saved-records")).not.toContainText("Offline");
     await expect(page.locator("#saved-records")).not.toContainText("No records yet");
@@ -83,7 +83,7 @@ test.describe("simulated server failures (route() cannot intercept service-worke
     await ctx.route(/\/api\/plugins\/fieldkit\/records\?/, (r) => r.abort("connectionrefused"));
     await openRecords();
     await expect(page.locator("#records-note")).toHaveAttribute("data-problem", "unreachable");
-    await expect(page.locator("#records-note")).toContainText("Can't reach Hermes");
+    await expect(page.locator("#records-note")).toContainText("Can't reach the server");
   });
 
   test("signed out (401): sign-in prompt, not 'Offline'", async () => {

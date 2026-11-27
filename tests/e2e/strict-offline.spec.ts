@@ -142,14 +142,14 @@ test("A: browser offline (page + service worker) → stays pending, survives res
   await ctx.setOffline(false);
   await expect.poll(async () => (await server.get(`${API}/records/${id}`)).status(), { timeout: 60_000 }).toBe(200);
   await expect(page.locator("header", { hasText: "all confirmed" })).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   const rec = await (await server.get(`${API}/records/${id}`)).json();
   expect(rec.revision).toBe(1);
   expect(rec.received_at * 1000).toBeGreaterThan(Date.parse(rec.completed_at));
   await page.goto(`${APP}#/diagnostics`);
   await page.getByRole("button", { name: "Run live connection test" }).click();
-  await expect(page.locator("text=Hermes answered just now")).toBeVisible({ timeout: 15_000 });
-  await expect(page.locator("text=✔ Hermes").first()).toBeVisible();
+  await expect(page.locator("text=the server answered just now")).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator("text=✔ server").first()).toBeVisible();
   await ctx.close();
   await server.dispose();
 });
@@ -169,7 +169,7 @@ test("B: navigator.onLine=true but every request blocked (page + service worker)
   // Warm the page first so cached "Hermes reachable" exists — then cut everything.
   const page = await ctx.newPage();
   await page.goto(APP);
-  await expect(page.locator("header", { hasText: "Hermes reachable" })).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("header", { hasText: "Server reachable" })).toBeVisible({ timeout: 30_000 });
   const blocked: string[] = [];
   const blockAll = (r: any) => { blocked.push(r.request().url()); return r.abort("internetdisconnected"); };
   await ctx.route("**/*", blockAll);  // applies to page and service worker fetches

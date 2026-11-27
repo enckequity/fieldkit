@@ -68,9 +68,9 @@ test("one Saved Records list across two isolated clients on the same Hermes acco
   const B = await setUp(`Office laptop ${run}`);
 
   const idA = await complete(A.page, `ACA-${run}`);
-  await expect(A.page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(A.page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   const idB = await complete(B.page, `ACB-${run}`);
-  await expect(B.page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(B.page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
 
   // A report for B's record as FieldKit stored them before 0.3 (still shown read-only, and copied for offline use).
   execFileSync(PY, ["-c", `
@@ -132,7 +132,7 @@ s.conn.commit()
 
   // B saves another record that A has NOT downloaded; A sees it online (remembered for offline).
   const idC = await complete(B.page, `ACC-${run}`);
-  await expect(B.page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(B.page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   await records(A.page);
   await expect(row(A.page, idC)).toHaveAttribute("data-availability", "needs-internet");
   await A.ctx.close();

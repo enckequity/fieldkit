@@ -106,7 +106,7 @@ describe("attachment previews (broken thumbnail / audio error on Results)", () =
   it("refuses a Hermes copy that doesn't match, and explains a damaged file that never uploaded", async () => {
     const broken = { ...att, blob: new Blob([]) };
     await expect(attachmentUrl(broken, (async () => new Response("other", { status: 200 })) as typeof fetch)).rejects.toThrow(/doesn't match/);
-    await expect(attachmentUrl({ ...broken, uploaded: false }, noFetch)).rejects.toThrow(/hasn't reached Hermes/);
+    await expect(attachmentUrl({ ...broken, uploaded: false }, noFetch)).rejects.toThrow(/hasn't reached the server/);
   });
   it("updates metadata (OCR text, transcript) without changing the file", async () => {
     const next = await updateAttachment(att.id, { meta: { ocr_text: "Pump P-204" } });

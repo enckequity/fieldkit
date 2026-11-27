@@ -55,7 +55,7 @@ def app_link(workflow_id: str | None = None, workspace_id: str | None = None) ->
     return {"url": f"{base}{path}" if base else path, **({} if base else {"path": path}), "absolute": bool(base),
             "source": "public_url setting" if explicit else ("detected from dashboard/app traffic" if base else "none"),
             "note": "" if base else "Open the FieldKit dashboard tab once over https (or set plugins.entries.fieldkit."
-                                   "settings.public_url) so Hermes can return a full link."}
+                                   "settings.public_url) so the assistant can return a full link."}
 
 
 # ----------------------------------------------------------------------------- record helpers
@@ -238,21 +238,21 @@ def get_attachment(a: dict) -> str:
 
 def conflict_view(store: Any, owner: Any, cf: dict, cache: Optional[dict] = None) -> dict:
     """One open conflict described so it can be recognised: which workspace, form and subject, when, from which
-    device, and exactly which answers differ between the copy on Hermes and the phone's copy."""
+    device, and exactly which answers differ between the server copy and the phone's copy."""
     cache = {} if cache is None else cache
     phone = (cf.get("client_payload") or {}).get("record") or {}
-    out = {"conflict_id": cf["id"], "record_id": cf["record_id"], "hermes_revision": cf.get("server_revision"),
+    out = {"conflict_id": cf["id"], "record_id": cf["record_id"], "server_revision": cf.get("server_revision"),
            "phone_edited_revision": cf.get("base_revision"), "phone_device": (cf.get("client_payload") or {}).get("device_id")}
     try:
         rec = store.get_record(owner, cf["record_id"])
     except NotFound:
-        return {**out, "note": "the record is no longer on Hermes"}
+        return {**out, "note": "the record is no longer on the server"}
     wf = store.get_workflow_any_owner(rec["workflow_id"], rec["workflow_version"]) or {}
     titles = cache.setdefault("_ws", {w["id"]: w["title"] for w in store.list_workspaces(published_only=False)})
     _, subj = _subject_value(store, rec, cache)
     labels = {f["id"]: engine.text(f.get("label")) for f in wf.get("fields") or []}
     mine, theirs = rec.get("answers") or {}, phone.get("answers") or {}
-    diffs = [{"question": labels.get(k, k), "field_id": k, "hermes": mine.get(k), "phone": theirs.get(k)}
+    diffs = [{"question": labels.get(k, k), "field_id": k, "server": mine.get(k), "phone": theirs.get(k)}
              for k in sorted(set(mine) | set(theirs)) if mine.get(k) != theirs.get(k)]
     return {**out, "workspace_id": rec.get("workspace_id"), "workspace_title": titles.get(rec.get("workspace_id")),
             "form_id": rec["workflow_id"], "form_title": engine.text(wf.get("title")) or rec["workflow_id"],
@@ -267,8 +267,8 @@ def get_sync_status(a: dict) -> str:
                conflicts=[conflict_view(store, ALL, cf, cache) for cf in open_[:20]])
 
 
-RESOLUTION_EFFECT = {"keep_server": "the copy on Hermes stays; the phone's edit is discarded",
-                     "use_client": "the phone's copy replaces the copy on Hermes (as a new revision)",
+RESOLUTION_EFFECT = {"keep_server": "the server copy stays; the phone's edit is discarded",
+                     "use_client": "the phone's copy replaces the server copy (as a new revision)",
                      "merge": "merged_answers become the new revision"}
 
 

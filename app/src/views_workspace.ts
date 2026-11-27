@@ -15,7 +15,7 @@ export const workspacesView: View = async (main) => {
   const card = h("div", { class: "card", id: "workspaces" },
     h("p", { class: "muted" }, mine.length > 1
       ? "Choose the workspace to work in. Home and the Workspace tab open the one you choose."
-      : "A workspace holds the forms you fill in, set up with Hermes for your work and kept offline on this phone."));
+      : "A workspace holds the forms you fill in, set up with your assistant for your work and kept offline on this phone."));
   if (mine.length) {
     card.append(h("h3", null, "On this device"), h("ul", { class: "ws-list" }, ...mine.map(({ manifest: m, pack }) => {
       const isCur = m.workspace_id === cur;
@@ -29,7 +29,7 @@ export const workspacesView: View = async (main) => {
   const avail = h("div");
   card.append(avail);
   main.append(card);
-  if (!isOnline()) { avail.append(h("p", { class: "muted" }, "Offline: connect to see workspaces available on Hermes.")); return; }
+  if (!isOnline()) { avail.append(h("p", { class: "muted" }, "Offline: connect to see workspaces available on the server.")); return; }
   try {
     const list = (await availableWorkspaces()).filter((w) => !mine.some((x) => x.manifest.workspace_id === w.id));
     if (list.length) {
@@ -42,10 +42,10 @@ export const workspacesView: View = async (main) => {
       const ul = h("ul", { class: "ws-list", id: "ws-available" }, ...items);
       const more = list.length > SHOW ? h("button", { class: "small", onclick: () => { items.forEach((li) => { li.hidden = false; }); more!.remove(); } },
         `Show all ${list.length}`) : null;
-      avail.append(h("h3", null, "Available on Hermes"), ul, more ?? "");
+      avail.append(h("h3", null, "Available on the server"), ul, more ?? "");
     }
-    else if (!mine.length) avail.append(h("p", { class: "muted" }, "No workspace yet. Ask Hermes: “Set up FieldKit for my work.”"));
-  } catch (e) { avail.append(h("p", { class: "muted" }, `Couldn't load workspaces from Hermes: ${(e as Error).message}`)); }
+    else if (!mine.length) avail.append(h("p", { class: "muted" }, "No workspace yet. Ask your assistant: “Set up FieldKit for my work.”"));
+  } catch (e) { avail.append(h("p", { class: "muted" }, `Couldn't load workspaces from the server: ${(e as Error).message}`)); }
 };
 
 export const workspaceView: View = async (main, p) => {
@@ -62,10 +62,10 @@ export const workspaceView: View = async (main, p) => {
       toast(r.failed.length ? "Some forms didn't download" : "Workspace ready offline", r.failed.length ? "error" : "ok");
       go(`#/workspace/${wid}?r=${Date.now()}`);
     } catch (e) {
-      status.textContent = e instanceof HttpError && e.status === 404 ? "This workspace isn't published on Hermes." : `Download failed: ${(e as Error).message}`;
+      status.textContent = e instanceof HttpError && e.status === 404 ? "This workspace isn't published on the server." : `Download failed: ${(e as Error).message}`;
       btn.disabled = false;
     }
-  } }, m ? "Update from Hermes" : "Download everything for offline");
+  } }, m ? "Update from server" : "Download everything for offline");
   if (!m) {
     // Not downloaded yet: say which workspace this is (from Hermes), or ask to sign in first.
     const heading = h("h2", null, "Workspace");
@@ -80,8 +80,8 @@ export const workspaceView: View = async (main, p) => {
         heading.textContent = text(info.title, l) || "Workspace";
         if (info.profile?.purpose) about.append(h("p", { class: "muted" }, String(info.profile.purpose)));
       } catch (e) {
-        if (e instanceof AuthRequired) { clear(card); card.append(heading, h("p", null, "Sign in to Hermes to download this workspace."), h("div", { class: "row" }, h("button", { class: "primary", onclick: () => signIn(`#/workspace/${wid}`) }, "Sign in"))); }
-        else if (e instanceof HttpError && e.status === 404) { about.append(h("p", { class: "muted" }, "This workspace isn't published on Hermes.")); btn.disabled = true; }
+        if (e instanceof AuthRequired) { clear(card); card.append(heading, h("p", null, "Sign in to the server to download this workspace."), h("div", { class: "row" }, h("button", { class: "primary", onclick: () => signIn(`#/workspace/${wid}`) }, "Sign in"))); }
+        else if (e instanceof HttpError && e.status === 404) { about.append(h("p", { class: "muted" }, "This workspace isn't published on the server.")); btn.disabled = true; }
       }
     }
     return;
@@ -91,11 +91,11 @@ export const workspaceView: View = async (main, p) => {
   const home = h("div", { class: "card", id: "ws-home", "data-ws": wid },
     h("div", { class: "ws-head" }, h("h2", null, wsTitle(m, l)),
       h("a", { class: "btn small", href: "#/workspaces" }, count > 1 ? "Switch workspace" : "All workspaces")),
-    m.starter ? h("div", { class: "banner warn" }, "Example with synthetic content. Ask Hermes to set up a workspace for your own work.") : null,
+    m.starter ? h("div", { class: "banner warn" }, "Example with synthetic content. Ask your assistant to set up a workspace for your own work.") : null,
     m.profile?.purpose ? h("p", null, String(m.profile.purpose)) : null,
     h("dl", { class: "kv" },
       h("dt", null, "Version"), h("dd", null, String(m.version_of_workspace ?? m.version ?? 1)),
-      h("dt", null, "Hermes"), h("dd", { id: "ws-after-sync" }, "Syncing saves your entries in your Hermes account. Ask your Hermes agent anything about them.")),
+      h("dt", null, "The server"), h("dd", { id: "ws-after-sync" }, "Syncing saves your entries in your server account. Ask your assistant anything about them.")),
     h("div", { class: "row" }, isOnline() ? btn : null), status);
   main.append(home);
   if (isOnline()) {

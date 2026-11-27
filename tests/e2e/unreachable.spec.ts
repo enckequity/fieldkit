@@ -40,7 +40,7 @@ test("network up but Hermes unreachable or captive portal: clear status, nothing
   await page.getByRole("button", { name: "Complete workflow" }).click();
   await expect(page.locator("text=Saved locally. Pending synchronization.")).toBeVisible({ timeout: 15_000 });
   await expect(page.locator("header .pill", { hasText: "1 awaiting confirmation" })).toBeVisible({ timeout: 15_000 });
-  await expect(page.locator("header .pill", { hasText: "no Hermes connection" })).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator("header .pill", { hasText: "no server connection" })).toBeVisible({ timeout: 15_000 });
   const recordId = page.url().split("#/results/")[1];
 
   // Network reachable at the IP level but API connections fail.
@@ -56,7 +56,7 @@ test("network up but Hermes unreachable or captive portal: clear status, nothing
   await ctx.unroute(isApi, refused);
   await page.getByRole("button", { name: /Sync now/ }).click();
   await expect(page.locator("header .pill", { hasText: "all confirmed" })).toBeVisible({ timeout: 30_000 });
-  await expect(page.locator("header .pill", { hasText: "Hermes reachable" })).toBeVisible();
+  await expect(page.locator("header .pill", { hasText: "Server reachable" })).toBeVisible();
   const rec = await (await ctx.request.get(`${API}/records/${recordId}`)).json();
   expect(rec.revision).toBe(1);
   expect(rec.answers.asset_id).toBe("PMP-0043");

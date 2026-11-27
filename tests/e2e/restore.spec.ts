@@ -57,7 +57,7 @@ test("records Hermes lost are detected on the device that made them and can be u
   await A.page.locator("#f-condition label", { hasText: "Fair" }).click();
   await A.page.locator("#f-guard_ok label", { hasText: "No" }).click();
   await A.page.getByRole("button", { name: "Complete workflow" }).click();
-  await expect(A.page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(A.page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   const id = A.page.url().split("#/results/")[1].split("?")[0];
 
   // Hermes loses the record and its workflow (what a reset / different data volume looks like). Test instance only.
@@ -81,7 +81,7 @@ c.commit()
   await records(A.page);
   await expect(A.page.locator(`#records-list li[data-record-id="${id}"]`)).toHaveAttribute("data-availability", "on-device");
   await expect(A.page.locator("#records-missing")).toHaveAttribute("data-missing", "1");
-  await expect(A.page.locator("#records-missing")).toContainText("Hermes doesn't have 1 record(s) from this device");
+  await expect(A.page.locator("#records-missing")).toContainText("The server doesn't have 1 record(s) from this device");
   await A.page.locator("#resend-missing").click();
   await expect.poll(async () => (await A.ctx.request.get(`${API}/records/${id}`)).status(), { timeout: 60_000, intervals: [1_000] }).toBe(200);
   const back = await (await A.ctx.request.get(`${API}/workflows/${WF_ID}?version=1`)).json();

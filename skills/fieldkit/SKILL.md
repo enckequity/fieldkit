@@ -1,11 +1,11 @@
 ---
 name: fieldkit
-description: Read what the user collected offline with the FieldKit phone app and synchronised to Hermes (entries such as observations, visits, inspections, interviews, survey responses, with photos, voice notes, GPS and signatures), then do what the user asks with it. Use when the user mentions FieldKit, their entries, visits, observations, field data or synced photos and voice notes. To set up or change a workspace (its forms), use the fieldkit-workspace-builder skill.
+description: Read what the user collected offline with the FieldKit phone app and synchronised to the server (entries such as observations, visits, inspections, interviews, survey responses, with photos, voice notes, GPS and signatures), then do what the user asks with it. Use when the user mentions FieldKit, their entries, visits, observations, field data or synced photos and voice notes. To set up or change a workspace (its forms), use the fieldkit-workspace-builder skill.
 ---
 
 # FieldKit
 
-FieldKit collects entries on a phone **with no internet** and syncs them to Hermes. Its job ends at making that data
+FieldKit collects entries on a phone **with no internet** and syncs them to the server. Its job ends at making that data
 reliably available to you. **FieldKit does not analyse anything:** when the user asks a question about their entries
 (what do you think, what do the photos show, summarise, compare, find trends, write a report), you do it yourself,
 with your own reasoning and tools.

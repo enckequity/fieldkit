@@ -88,7 +88,7 @@ test("install online, then work fully offline after a cold restart, then sync", 
   await ctx.clearCookies();
   page = await ctx.newPage();
   await page.goto(`${APP}#/sync`);  // navigation 401 → service worker serves the cached shell
-  await expect(page.locator("text=Sign in to Hermes to continue syncing").first()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("text=Sign in to the server to continue syncing").first()).toBeVisible({ timeout: 30_000 });
   await expect(page.locator("text=Waiting (1)")).toBeVisible();
 
   // ---------- 5. sign in again → sync resumes, server acknowledges exactly one record
@@ -96,10 +96,10 @@ test("install online, then work fully offline after a cold restart, then sync", 
   await page.reload();
   await expect.poll(async () => (await ctx.request.get(`${API}/records/${recordId}`)).status(), { timeout: 30_000 }).toBe(200);
   await page.goto(recordUrl);
-  await expect(page.locator("text=Saved to Hermes — confirmed")).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("text=Saved to the server — confirmed")).toBeVisible({ timeout: 30_000 });
   await expect(page.locator("header .pill", { hasText: "all confirmed" })).toBeVisible({ timeout: 15_000 });
-  await expect(page.locator("header .pill", { hasText: "Hermes reachable" })).toBeVisible({ timeout: 15_000 });
-  await expect(page.locator("text=Ask your Hermes agent about this entry")).toBeVisible();
+  await expect(page.locator("header .pill", { hasText: "Server reachable" })).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator("text=Ask your assistant about this entry")).toBeVisible();
   // re-run sync: still exactly one server record (idempotent)
   await page.goto(`${APP}#/sync`);
   await page.getByRole("button", { name: /Sync now/ }).click();

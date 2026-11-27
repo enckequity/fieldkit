@@ -59,7 +59,7 @@ test("audit fixes: Back after re-tapping a tab, readable records from other devi
   await f.goto(`${APP}#/workspace/water-survey`);
   await expect(f.locator("header .pill").first()).toHaveText(/not signed in|sign-in needed/, { timeout: 15_000 });
   await expect(f.locator("header .pill", { hasText: "all confirmed" })).toHaveCount(0);
-  await expect(f.locator("#ws-preview")).toContainText("Sign in to Hermes to download this workspace.");
+  await expect(f.locator("#ws-preview")).toContainText("Sign in to the server to download this workspace.");
   await expect(f.locator("#ws-preview").getByRole("button", { name: "Sign in" })).toBeVisible();
   await fresh.close();
 

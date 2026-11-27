@@ -6,7 +6,7 @@ import { describe, looksLikeHermes, markLast, netlog, pathOf } from "./netlog";
 
 export class AuthRequired extends Error {
   /** true only when the 401 demonstrably came from Hermes (FastAPI JSON), not from a portal/proxy. */
-  constructor(public fromHermes = false) { super("Hermes sign-in required"); }
+  constructor(public fromHermes = false) { super("Server sign-in required"); }
 }
 export class Offline extends Error { constructor(msg = "Server unreachable") { super(msg); } }
 export class HttpError extends Error {
@@ -43,7 +43,7 @@ export async function api<T = any>(path: string, init: RequestInit & { json?: un
   });
   const ct = res.headers.get("content-type") || "";
   // A redirect (opaqueredirect) is NOT proof Hermes answered: captive portals redirect too.
-  if (res.type === "opaqueredirect") { verifyLast(path, false, "redirect (not proof of Hermes)"); throw new AuthRequired(false); }
+  if (res.type === "opaqueredirect") { verifyLast(path, false, "redirect (not proof of the server)"); throw new AuthRequired(false); }
   const body = ct.includes("json") ? await res.json().catch(() => null) : await res.text();
   const hermes = looksLikeHermes(ct, body);
   verifyLast(path, hermes);

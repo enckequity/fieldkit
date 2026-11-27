@@ -14,3 +14,11 @@ def _isolated_hermes_home(tmp_path_factory, monkeypatch):
     """Nothing in the tests may read or write the developer's ~/.hermes."""
     monkeypatch.setenv("HERMES_HOME", str(tmp_path_factory.mktemp("hermes-home")))
     yield
+
+
+@pytest.fixture(autouse=True)
+def _unbound_runtime(monkeypatch):
+    """A test that calls register(ctx) binds plugin settings process-wide; never let them reach the next test."""
+    from fieldkit_core import runtime
+    monkeypatch.setattr(runtime, "config_get", lambda key, default=None: default)
+    yield

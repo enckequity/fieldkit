@@ -119,7 +119,7 @@ def test_sync_status_and_conflict_resolution_tools(store, tmp_path):
     c = st["conflicts"][0]
     # Each conflict can be recognised: its form, subject and exactly which answers differ.
     assert c["record_id"] == "rec_conf_00001" and c["form_title"] == "Equipment inspection" and c["subject"] == "PMP-0101"
-    assert [(d["field_id"], d["hermes"], d["phone"]) for d in c["differences"] if d["field_id"] == "condition"] == [("condition", "fair", "good")]
+    assert [(d["field_id"], d["server"], d["phone"]) for d in c["differences"] if d["field_id"] == "condition"] == [("condition", "fair", "good")]
     # The wrong record is refused; without the user's confirmation nothing changes (a preview).
     wrong = call("fieldkit_resolve_conflict", conflict_id=c["conflict_id"], record_id="rec_other_000001", resolution="keep_server")
     assert not wrong["ok"] and "rec_conf_00001" in wrong["error"]

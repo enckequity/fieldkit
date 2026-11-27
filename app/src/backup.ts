@@ -68,7 +68,7 @@ export async function parseBackup(text: string): Promise<ImportPlan> {
 export function accountMismatch(backup: BackupAccount | null, current: BackupAccount | null): string | null {
   if (!backup || !current || backup.user_id === current.user_id) return null;
   const name = (a: BackupAccount) => (a.display_name && a.display_name !== a.user_id ? `${a.display_name} (${a.user_id})` : a.user_id);
-  return `This backup is from Hermes account “${name(backup)}”, but this phone is signed in as “${name(current)}”. `
+  return `This backup is from server account “${name(backup)}”, but this phone is signed in as “${name(current)}”. `
     + `Its records would be added to this phone, and any that were never uploaded would upload to “${name(current)}”. Import anyway?`;
 }
 

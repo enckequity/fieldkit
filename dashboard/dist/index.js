@@ -1871,7 +1871,7 @@
           ] },
           h(Track, { byStatus: sync.records_by_sync_status, conflicts: sync.open_conflicts }),
           h(Stats, { sync }),
-          h("p", { className: "fk-hint" }, "FieldKit collects and syncs. Ask your Hermes agent to read, analyse or summarise synced entries.")
+          h("p", { className: "fk-hint" }, "FieldKit collects and syncs. Ask your assistant to read, analyse or summarise synced entries.")
         ),
         h(
           "div",
@@ -1879,7 +1879,7 @@
           h(
             Section,
             { title: "Workspaces", meta: own.length || null },
-            own.length ? h(Workspaces, { items: own }) : h("p", { className: "fk-empty" }, "No workspace yet. In Hermes, say: \u201CSet up FieldKit for my work.\u201D")
+            own.length ? h(Workspaces, { items: own }) : h("p", { className: "fk-empty" }, "No workspace yet. In chat with your assistant, say: \u201CSet up FieldKit for my work.\u201D")
           ),
           h(Section, { title: "Recent records" }, h(RecordList, { records: recs.records, compact: true }))
         )
@@ -2032,7 +2032,7 @@
               { className: "fk-kv", style: { marginTop: 12 } },
               h("dt", null, "Completed on phone"),
               h("dd", null, ts(rec.completed_at)),
-              h("dt", null, "Received by Hermes"),
+              h("dt", null, "Received by the server"),
               h("dd", null, ts(rec.received_at)),
               h("dt", null, "Revision"),
               h("dd", null, rec.revision),
@@ -2059,7 +2059,7 @@
           ))
         ) : null,
         rep ? h("div", { className: "fk-legacy" }, h("h3", null, "Report from FieldKit before 0.3"), h(ReportView, { r: rep })) : null,
-        h("p", { className: "fk-hint" }, "To analyse this entry, ask your Hermes agent. It can open the photos and voice notes.")
+        h("p", { className: "fk-hint" }, "To analyse this entry, ask your assistant. It can open the photos and voice notes.")
       );
     }
     const sevColor = { critical: "var(--bad)", high: "var(--bad)", medium: "var(--wait)", low: "var(--ok)", info: "var(--mute)" };
@@ -2090,7 +2090,7 @@
             return h(
               "div",
               { key: e.attachment_id },
-              e.transcript ? `\u201C${e.transcript}\u201D (${e.transcript_source === "device" ? "transcribed on the phone" : "transcribed by Hermes"})` : `Not transcribed: ${(_a3 = e.transcript_error) != null ? _a3 : "unknown reason"}`
+              e.transcript ? `\u201C${e.transcript}\u201D (${e.transcript_source === "device" ? "transcribed on the phone" : "transcribed by the assistant"})` : `Not transcribed: ${(_a3 = e.transcript_error) != null ? _a3 : "unknown reason"}`
             );
           })
         ),
@@ -2200,11 +2200,11 @@
           c.completed_at ? h("span", { className: "mute" }, `  ${new Date(c.completed_at).toLocaleString()}`) : null
         ),
         h("div", { className: "id" }, c.record_id),
-        h("p", { className: "mute" }, `The phone edited revision ${c.base_revision}; Hermes already has revision ${c.server_revision}. Choose which copy to keep.`),
+        h("p", { className: "mute" }, `The phone edited revision ${c.base_revision}; the server already has revision ${c.server_revision}. Choose which copy to keep.`),
         server ? h(
           "table",
           { className: "fk-table", style: { marginTop: 8 } },
-          h("thead", null, h("tr", null, h("th", null, "Answer"), h("th", null, "Hermes copy"), h("th", null, "Phone copy"))),
+          h("thead", null, h("tr", null, h("th", null, "Answer"), h("th", null, "Server copy"), h("th", null, "Phone copy"))),
           h("tbody", null, keys.map((k) => {
             const diff = JSON.stringify(mine[k]) !== JSON.stringify(phone[k]);
             return h(
@@ -2298,7 +2298,7 @@
             h(
               "ol",
               null,
-              h("li", null, "Scan the code (or open the link) on the phone while online and sign in to Hermes."),
+              h("li", null, "Scan the code (or open the link) on the phone while online and sign in to the server."),
               h("li", null, "Open your workspace and tap \u201CDownload everything for offline\u201D. Optional: OCR and translation packs in Offline Packs."),
               h("li", null, "Add to Home Screen. Android: menu, then Install app. iPhone: Share, then Add to Home Screen."),
               h("li", null, "Check the Offline readiness card on Home. After that it works with no connection.")
@@ -2325,7 +2325,7 @@
         h(
           "div",
           { className: "fk-top" },
-          h("span", { className: "mute" }, "Observations collected offline on phones, synced to Hermes"),
+          h("span", { className: "mute" }, "Observations collected offline on phones, synced to the server"),
           h(
             "nav",
             { className: "fk-tabs", "aria-label": "FieldKit sections" },

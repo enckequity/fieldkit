@@ -271,7 +271,7 @@ class Store:
 
     def audit(self, c: sqlite3.Connection, actor: Any, action: str, target: str = "", detail: Any = None) -> None:
         c.execute("INSERT INTO audit_events(at, actor, action, target, detail) VALUES (?,?,?,?,?)",
-                  (_now(), "hermes" if actor is ALL else str(actor), action, target, _j(detail or {})))
+                  (_now(), "assistant" if actor is ALL else str(actor), action, target, _j(detail or {})))
 
     # ------------------------------------------------------------------ users/devices
     def touch_user(self, user_id: str, display_name: str = "", email: str = "") -> None:
@@ -364,7 +364,7 @@ class Store:
                 return {"restored": False, "version": version}
             if row and version > row["latest_version"]:
                 raise Invalid(f"version {version} is newer than this workflow's latest ({row['latest_version']}): "
-                              "new versions are published through Hermes, not restored")
+                              "new versions are published through the assistant, not restored")
             if not row:   # the whole workflow was lost (data reset): back as an unpublished record of that version
                 c.execute("INSERT INTO workflows(id, owner_user_id, title, domain, latest_version, published_version, status, "
                           "created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)",

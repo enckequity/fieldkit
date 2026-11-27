@@ -6,8 +6,8 @@ description: Set up, change or undo changes to a FieldKit workspace: the offline
 # FieldKit workspace builder
 
 A workspace is the user's work turned into offline forms: what they record each time (answers, notes, issues,
-photos, voice notes, GPS, signatures). FieldKit only collects and syncs; analysing the entries later is the user's
-Hermes agent's job, when they ask. **Use the user's own words, units and categories; never invent questions, options,
+photos, voice notes, GPS, signatures). FieldKit only collects and syncs; analysing the entries later is the
+assistant's job, when they ask. **Use the user's own words, units and categories; never invent questions, options,
 limits or rules they did not give you.**
 
 ## 1. Interview (in the user's language, a few questions at a time)

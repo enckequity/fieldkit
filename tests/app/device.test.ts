@@ -70,7 +70,7 @@ describe("load problems are reported clearly", () => {
     const outdated = describeLoadProblem(new HttpError(404, { detail: "Not Found" }, true), true, "0.1.9", "0.2.1");
     expect(outdated.kind).toBe("server-outdated");
     expect(outdated.message).toContain("0.1.9");
-    expect(outdated.message).toContain("Restart the Hermes dashboard");
+    expect(outdated.message).toContain("Restart the dashboard");
     expect(describeLoadProblem(new HttpError(404, null), true).kind).toBe("server-outdated");
     const err = describeLoadProblem(new HttpError(500, "boom"), true);
     expect(err.kind).toBe("server-error");
