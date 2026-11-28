@@ -27,4 +27,4 @@ provides_tools:
 python_dependencies:
   - "jsonschema>=4.17,<5"
 config_keys:
-  - public_url
+  - fieldkit.public_url
