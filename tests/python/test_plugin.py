@@ -89,7 +89,7 @@ def test_manifest_matches_registration(ctx):
     assert sorted(ctx.skills) == ["fieldkit", "fieldkit-workspace-builder"]
     assert "fieldkit.workspace" in ctx.prompt_sections
     assert ctx.hooks == [] and "provides_hooks" not in manifest           # nothing runs in the background
-    assert manifest["config_keys"] == ["public_url"]
+    assert manifest["config_keys"] == ["fieldkit.public_url"]
 
 
 def test_skills_and_session_note_name_only_registered_tools(ctx):
